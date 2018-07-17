@@ -1,0 +1,26 @@
+@searchlog =
+    EXTRACT Tcs double?,
+            Main string,
+            Side_1_Route string,
+            Activation_Date DateTime?,
+            Latitude float?,
+            Longitude float?,
+            Count_Date DateTime?,
+            Peak_Hr_Vehicle_Volume long?,
+            Peak_Hr_Pedestrian_Volume long?,
+            Year int,
+            Day string
+    FROM "A5_dataset.csv"
+    USING Extractors.Csv(silent:true, skipFirstNRows:1);
+
+@rs1 = 
+    SELECT Main,SUM(Peak_Hr_Vehicle_Volume + Peak_Hr_Pedestrian_Volume) AS Total
+    FROM @searchlog
+    GROUP BY Main ;
+    
+
+OUTPUT @rs1
+    TO "out2.csv"
+    ORDER BY Total DESC
+    FETCH 10 ROWS
+    USING Outputters.Csv();
